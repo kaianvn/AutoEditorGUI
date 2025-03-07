@@ -1,3 +1,5 @@
+import requests
+import webbrowser
 import subprocess
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
@@ -309,6 +311,41 @@ def save_settings():
     with open(CONFIG_FILE, 'w') as configfile:
         config.write(configfile)
 
+def check_for_updates(silent=False):
+    """Check if a newer version is available on GitHub"""
+    global version
+    
+    try:
+        # Replace with your actual GitHub repository details
+        repo_owner = "kaianvn"  # Your GitHub username
+        repo_name = "AutoEditorGUI"  # Your repo name
+        
+        # Call the GitHub API to get the latest release
+        response = requests.get(f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest", timeout=5)
+        
+        if response.status_code == 200:
+            # Extract version from the tag_name
+            data = response.json()
+            latest_tag = data['tag_name']  # e.g. "v1.0.0"
+            
+            # Remove leading 'v' if present
+            latest_version = latest_tag.lstrip('v')
+            
+            # Simple version comparison
+            if latest_version != version:
+                if messagebox.askyesno("Update Available", 
+                                     f"New version {latest_version} is available (you have {version}).\n\nOpen download page?"):
+                    # Open the release page in a web browser
+                    webbrowser.open(data['html_url'])
+            elif not silent:
+                messagebox.showinfo("Up to Date", f"You have the latest version ({version})!")
+        else:
+            if not silent:
+                messagebox.showerror("Error", f"Failed to check for updates: HTTP {response.status_code}")
+    except Exception as e:
+        if not silent:
+            messagebox.showerror("Error", f"Failed to check for updates: {e}")
+
 def on_exit():
     try:
         save_settings()  # Save settings first
@@ -445,6 +482,10 @@ motion_threshold_scale.grid(row=10, column=1, padx=5, pady=5)
 default_motion_threshold = tk.BooleanVar(value=True)
 ttk.Checkbutton(options_frame, text="Use default", variable=default_motion_threshold, command=toggle_motion_threshold).grid(row=10, column=2, padx=5, pady=5)
 toggle_motion_threshold()
+
+# Add check for updates button
+check_updates_btn = ttk.Button(options_frame, text="Check for Updates", command=lambda: check_for_updates())
+check_updates_btn.grid(row=11, column=1, columnspan=2, padx=5, pady=5)
 
 root.protocol("WM_DELETE_WINDOW", on_exit)
 load_settings()
