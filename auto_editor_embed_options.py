@@ -7,6 +7,8 @@ import configparser
 import os
 
 # Global variables
+version = "1.0.0"
+creator = "kaianvn"
 cached_progress = 0
 dark_mode = False
 CONFIG_FILE = "settings.ini"
@@ -341,6 +343,10 @@ progress_bar = ttk.Progressbar(center_frame, orient="horizontal", length=300, mo
 progress_bar.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
 process_btn = ttk.Button(center_frame, text="Process File", command=process_file)
 process_btn.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+version_label = ttk.Label(process_frame, text=f"Version {version}", foreground="gray")
+version_label.place(relx=0.99, rely=0.99, anchor="se", bordermode="outside", x=-10, y=-10)
+madeby_label = ttk.Label(process_frame, text=f"Made by @{creator}", foreground="gray")
+madeby_label.place(relx=0.04, rely=0.99, anchor="sw", bordermode="outside", x=-10, y=-10)
 
 # Options tab.
 options_frame = ttk.Frame(notebook)
